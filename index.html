@@ -98,7 +98,7 @@
             text-align: center;
             margin-top: 30px;
             color: #7f8c8d;
-            font-size: 16px;
+            font-size: 14px;
             padding: 16px 0;
         }
         @media (max-width: 600px) {
@@ -147,56 +147,60 @@
     </div>
 
     <footer>
-        <h4>Created by Quintin G.</h4>
+        <h3>Created by Quintin G.</h3>
     </footer>
 
     <script>
+        // Function to calculate day of year (1-366)
+        function getDayOfYear(date) {
+            const start = new Date(date.getFullYear(), 0, 0);
+            const diff = date - start;
+            const oneDay = 1000 * 60 * 60 * 24;
+            return Math.floor(diff / oneDay);
+        }
+
+        // Function to check if a year is a leap year
+        function isLeapYear(year) {
+            return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+        }
+
         // Function to convert Calendar date to Julian date
         function calendarToJulian(year, month, day) {
-            // For this specific tool, we're using a custom Julian date that should be 
-            // approximately 25122 for May 2025
+            // Create date object
+            const date = new Date(year, month - 1, day);
             
-            // Rather than using a complex astronomical calculation,
-            // we'll use a simpler approach with a known reference point
+            // Extract last two digits of year
+            const yearDigits = year % 100;
             
-            // If today (May 2, 2025) should be 25122, we'll use that as our reference
-            const referenceYear = 2025;
-            const referenceMonth = 5;
-            const referenceDay = 2;
-            const referenceJulian = 25122;
+            // Calculate day of year (1-366)
+            const dayOfYear = getDayOfYear(date);
             
-            // Calculate days between dates using a simple approximation
-            const daysDiff = (year - referenceYear) * 365 + 
-                             (month - referenceMonth) * 30 + 
-                             (day - referenceDay);
-            
-            // Add the difference to our reference Julian date
-            return referenceJulian + daysDiff;
+            // Combine as YYDDD format
+            return yearDigits * 1000 + dayOfYear;
         }
 
         // Function to convert Julian date to Calendar date
         function julianToCalendar(julianDate) {
-            // Using the same reference point as in calendarToJulian
-            const referenceYear = 2025;
-            const referenceMonth = 5;
-            const referenceDay = 2;
-            const referenceJulian = 25122;
+            // Extract year and day of year
+            const yearDigits = Math.floor(julianDate / 1000);
+            const dayOfYear = julianDate % 1000;
             
-            // Calculate days difference
-            const daysDiff = julianDate - referenceJulian;
+            // Determine century (assuming 1900s if yearDigits >= 50, otherwise 2000s)
+            const baseYear = yearDigits >= 50 ? 1900 : 2000;
+            const fullYear = baseYear + yearDigits;
             
-            // Create a new date object starting from our reference date
-            const date = new Date(referenceYear, referenceMonth - 1, referenceDay);
+            // Create date for January 1st of that year
+            const date = new Date(fullYear, 0, 1);
             
-            // Add the day difference
-            date.setDate(date.getDate() + daysDiff);
+            // Add days (subtract 1 because Jan 1 is day 1)
+            date.setDate(date.getDate() + dayOfYear - 1);
             
             // Extract components
-            const year = date.getFullYear();
-            const month = date.getMonth() + 1; // JavaScript months are 0-based
-            const day = date.getDate();
-            
-            return { year, month, day };
+            return {
+                year: date.getFullYear(),
+                month: date.getMonth() + 1, // JavaScript months are 0-based
+                day: date.getDate()
+            };
         }
 
         // Format date as YYYY-MM-DD
@@ -229,7 +233,7 @@
             
             const julianDate = calendarToJulian(year, month, day);
             
-            document.getElementById('julianValue').textContent = Math.floor(julianDate);
+            document.getElementById('julianValue').textContent = julianDate;
             document.getElementById('julianResult').style.display = 'block';
         });
 
@@ -241,7 +245,7 @@
                 return;
             }
             
-            const julianDate = parseFloat(julianDateStr);
+            const julianDate = parseInt(julianDateStr);
             
             if (isNaN(julianDate)) {
                 alert('Please enter a valid number');
