@@ -128,7 +128,7 @@
         <div class="section">
             <h2>Calendar to Julian</h2>
             <div class="input-group">
-                <label for="calendarDate">Click on Calendar Date:</label>
+                <label for="calendarDate">Enter Calendar Date Below:</label>
                 <input type="date" id="calendarDate">
             </div>
             <button id="convertToJulian">Click to Convert to Julian Date</button>
@@ -138,7 +138,7 @@
         <div class="section">
             <h2>Julian to Calendar</h2>
             <div class="input-group">
-                <label for="julianDate">Enter Julian Date:</label>
+                <label for="julianDate">Enter Julian Date Below:</label>
                 <input type="number" id="julianDate" placeholder="e.g., 25122">
             </div>
             <button id="convertToCalendar">Click to Convert to Calendar Date</button>
@@ -147,16 +147,32 @@
     </div>
 
     <footer>
-        <h3>Created by Quintin G.</h3>
+        <h4><b>Created by Quintin G.<b></h4>
     </footer>
 
     <script>
         // Function to calculate day of year (1-366)
         function getDayOfYear(date) {
-            const start = new Date(date.getFullYear(), 0, 0);
-            const diff = date - start;
-            const oneDay = 1000 * 60 * 60 * 24;
-            return Math.floor(diff / oneDay);
+            // Create a more reliable calculation of day of year
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            const day = date.getDate();
+            
+            // Array with days in each month (non-leap year)
+            const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+            
+            // Adjust February for leap years
+            if (isLeapYear(year)) {
+                daysInMonth[1] = 29;
+            }
+            
+            // Calculate day of year
+            let dayOfYear = day;
+            for (let i = 0; i < month; i++) {
+                dayOfYear += daysInMonth[i];
+            }
+            
+            return dayOfYear;
         }
 
         // Function to check if a year is a leap year
